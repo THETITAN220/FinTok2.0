@@ -1,0 +1,17 @@
+flask
+flask-cors
+python-dotenv
+langchain
+langchain-community
+langchain-cohere
+faiss-cpu
+cohere
+openai
+vercel-ai
+pydantic
+PyPDF2
+speechrecognition
+gtts
+torch
+transformers
+deep-translator

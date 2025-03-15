@@ -7,7 +7,10 @@ from langchain_community.llms import Cohere
 from langchain.chains import RetrievalQA
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import CharacterTextSplitter
+from flask_cors import CORS
 
+app = Flask(__name__)
+CORS(app, origins=["http://localhost:3000"], supports_credentials=True)
 # Load environment variables from .env file
 load_dotenv()
 

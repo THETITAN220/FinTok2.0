@@ -1,0 +1,31 @@
+# Ignore the virtual environment folder
+myenv/
+
+# Byte-compiled / cached
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.sublime-workspace
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# Environment variables / Secrets
+.env
+*.env
+
+# Python packaging
+*.egg-info/
+dist/
+build/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# MacOS files
+.DS_Store

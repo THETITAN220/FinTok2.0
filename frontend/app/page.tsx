@@ -84,7 +84,7 @@ export default function Home() {
     {/* Navbar */}
     <div className="bg-indigo-600 text-white flex justify-between items-center px-6 py-4 shadow-lg">
       <div className="flex items-center">
-        <h1 className="text-2xl font-bold tracking-tight">FinTok</h1>
+        <h1 className="text-2xl font-bold tracking-tight">FinTok 2.0</h1>
         {/* <div className="ml-2 bg-indigo-500 px-2 py-1 rounded-md text-xs font-medium">
           BETA
         </div> */}
@@ -168,14 +168,14 @@ export default function Home() {
                   <div className="flex flex-col">
                     {chat.aiAudioUrl && (
                       <div className="p-4 bg-indigo-50 text-indigo-900 rounded-2xl rounded-tl-none w-fit max-w-lg shadow-sm mb-2">
-                        <div className="text-xs text-indigo-500 mb-1">FinTok</div>
+                        <div className="text-xs text-indigo-500 mb-1">FinTok 2.0</div>
                         <CustomAudioPlayer audioUrl={chat.aiAudioUrl} />
                       </div>
                     )}
 
                     {chat.aiText && (
                       <div className="p-4 bg-indigo-50 text-indigo-900 rounded-2xl rounded-tl-none w-fit max-w-lg shadow-sm">
-                        <div className="text-xs text-indigo-500 mb-1">FinTok</div>
+                        <div className="text-xs text-indigo-500 mb-1">FinTok 2.0</div>
                         <p>{chat.aiText}</p>
                       </div>
                     )}
@@ -221,7 +221,7 @@ export default function Home() {
 
     {/* Footer */}
     <div className="bg-indigo-900 text-indigo-200 py-2 px-6 text-xs flex items-center justify-between">
-      <div>FinTok © 2025 | Multilingual loan advisor</div>
+      <div>FinTok 2.0 © 2025 | Multilingual loan advisor</div>
       <div className="flex items-center">
         <span className="mr-2">AI Model:</span>
         <span className="text-white font-medium bg-indigo-800 px-2 py-1 rounded">Sarvam + Flash</span>

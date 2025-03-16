@@ -60,7 +60,6 @@ vectorstore.save_local(faiss_index_path)
 
 retriever = vectorstore.as_retriever()
 
-# Initialize Gemini model
 llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", google_api_key=GOOGLE_API_KEY) # Changed to Gemini
 
 qa_chain = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever)

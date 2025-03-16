@@ -1,4 +1,3 @@
-// import {tts} from "./tts";
 
 export async function translate(
   translate_text: string,
@@ -21,10 +20,5 @@ export async function translate(
 
   const translationData = await translationResponse.json();
   return translationData.translated_text;
-  // const finalText = translationData.translated_text;
-  // const finalLanguage = translate_lang;
-  // await tts(finalText, finalLanguage);
 
-  // console.log("Translation result:", finalText);
-  // console.log("Final Language", finalLanguage);
 }

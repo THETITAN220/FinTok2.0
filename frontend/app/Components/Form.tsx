@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -14,13 +15,37 @@ const LoanForm = () => {
     duration: '',
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSelectChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, loanType: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form Data:', formData);
+
+    try {
+      const response = await fetch('https://localhost:5000/query', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit the loan application');
+      }
+
+      const data = await response.json();
+      console.log('Response:', data);
+      alert('Loan application submitted successfully!');
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error submitting loan application');
+    }
   };
 
   return (
@@ -28,12 +53,12 @@ const LoanForm = () => {
       <h2 className="text-2xl font-semibold mb-4">Loan Application Form</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <Label htmlFor="salary"> Salary</Label>
+          <Label htmlFor="salary">Salary</Label>
           <Input id="salary" name="salary" type="number" value={formData.salary} onChange={handleChange} required />
         </div>
         <div>
           <Label htmlFor="loanType">Type of Loan</Label>
-          <Select name="loanType" value={formData.loanType} onValueChange={(value) => setFormData({ ...formData, loanType: value })} required>
+          <Select value={formData.loanType} onValueChange={handleSelectChange} required>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select Loan Type" />
             </SelectTrigger>
@@ -60,3 +85,4 @@ const LoanForm = () => {
 };
 
 export default LoanForm;
+

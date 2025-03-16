@@ -5,7 +5,7 @@ export async function translate(
   translate_lang: string
 ) {
   console.log(`Translating AI response to ${translate_lang}...`);
-  const translationResponse = await fetch("http://localhost:5000/translate", {
+  const translationResponse = await fetch("api/translate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

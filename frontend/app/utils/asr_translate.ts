@@ -30,6 +30,8 @@
 //   }
 // }
 
+// 
+
 import { flash } from "./flash";  
 
 export async function transcribeAudio(audioBlob: Blob): Promise<{ text: string; audioUrl: string }> {
@@ -37,7 +39,7 @@ export async function transcribeAudio(audioBlob: Blob): Promise<{ text: string; 
   formData.append("file", audioBlob, "audio.wav");
 
   try {
-    const response = await fetch("http://localhost:5000/transcribe", {
+    const response = await fetch("api/transcribe", {
       method: "POST",
       body: formData,
     });
@@ -45,17 +47,31 @@ export async function transcribeAudio(audioBlob: Blob): Promise<{ text: string; 
     if (!response.ok) throw new Error("Transcription failed");
 
     const data = await response.json();
+    console.log(data)
     const language_code = data.languageCode || "en-IN";
+
+    // Define valid intents
+    const IC_enum = ["loanapplication", "loanEligibility", "financialGuidance"];
+    
+    // Extract intent classification (assuming it's inside data)
+    const IC = data.intent; 
 
     console.log("Transcription:", data.transcript);
     console.log("Transcription language code:", language_code);
-    const airesponse = await flash({ transcript: data.transcript }, language_code);
+    console.log("Detected Intent:", IC);
 
-    const audioUrl = airesponse.audioUrl || ""; // Ensure audioUrl is defined
-    return { text: airesponse.aiData.transcript, audioUrl }; // Ensure flash returns audioUrl
+    if (IC === "generalQuery" ) {
+      const airesponse = await flash({ transcript: data.transcript }, language_code);
+      const audioUrl = airesponse.audioUrl || ""; // Ensure audioUrl is defined
+
+      return { text: airesponse.aiData.transcript, audioUrl }; // Ensure flash returns audioUrl
+    }
+
+    // If intent does not match, return transcription without AI processing
+    return { text: data.transcript, audioUrl: "" };
+
   } catch (error) {
     console.error("Error in transcription:", error);
     return { text: "Transcription failed", audioUrl: "" };
   }
 }
-

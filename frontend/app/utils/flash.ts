@@ -8,7 +8,7 @@ interface FlashData {
 
 export async function flash(data: FlashData, language_code: string) {
   console.log("Requesting AI response for transcript:", data.transcript);
-  const aiResponse = await fetch("http://localhost:5000/flash", {
+  const aiResponse = await fetch("api/flash", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

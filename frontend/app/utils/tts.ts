@@ -10,7 +10,7 @@ export async function tts(finalText: string, finalLanguage: string) {
 
   console.log("Requesting TTS conversion with payload:", ttsPayload);
 
-  const ttsResponse = await fetch("http://localhost:5000/tts", {
+  const ttsResponse = await fetch("api/tts", {
     method: "POST",
     body: JSON.stringify(ttsPayload),
     headers: { "Content-Type": "application/json" },

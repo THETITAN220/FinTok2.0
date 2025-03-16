@@ -60,7 +60,7 @@ export async function transcribeAudio(audioBlob: Blob): Promise<{ text: string; 
     console.log("Transcription language code:", language_code);
     console.log("Detected Intent:", IC);
 
-    if (IC === "generalQuery" ) {
+    if (IC === "generalQuery" || IC === "financialGuidance") {
       const airesponse = await flash({ transcript: data.transcript }, language_code);
       const audioUrl = airesponse.audioUrl || ""; // Ensure audioUrl is defined
 

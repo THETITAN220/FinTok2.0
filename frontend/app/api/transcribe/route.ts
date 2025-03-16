@@ -6,24 +6,51 @@ const IC_enum = ["loanApplication", "loanEligibility", "financialGuidance", "gen
 async function intentClassifier(transcript: string, apiKey: string): Promise<string> {
   try {
     const client = new Mistral({ apiKey });
+
+    // Explicit and structured prompt
     const chatResponse = await client.chat.complete({
       model: "mistral-small-latest",
       messages: [
-        { role: "system", content: "You are an AI that classifies text into predefined categories. The predefined categories are: loanapplication,loanEligibility,financialGuidance. Classify it as one of these based on the user query. Look at the keywords used and make a judgement if they want to get some financial tip  or loan application guidance or loan eligibility criteria. If the kyewords dont show the intent, try to predict based on the words used." },
-        { role: "user", content: `Classify the following statement into one of these categories: ${IC_enum.join(", ")}.
-          \nStatement: "${transcript}"\n\nReturn only the category name.` },
+        { role: "system", content: `You are an AI designed to classify text into predefined categories.
+        
+        **Categories:**
+        - loanApplication → If the user is asking about applying for a loan.
+        - loanEligibility → If the user is inquiring about whether they qualify for a loan.
+        - financialGuidance → If the user seeks financial advice (e.g., managing expenses, investments).
+        - generalQuery → If the query does not match the above.
+
+        **Instructions:** 
+        - Analyze the input and map it to one of the categories.
+        - Only return the exact category name.
+        - If unsure, return "generalQuery".` },
+        { role: "user", content: `Classify the following statement: "${transcript}". 
+        Respond with only one of the following categories: ${IC_enum.join(", ")}` },
       ],
-      temperature: 0.2,
+      temperature: 0.1, // Lower temperature to make responses more deterministic
     });
 
-    if (!chatResponse || !chatResponse.choices || chatResponse.choices.length === 0) {
-      throw new Error("Mistral AI response is empty");
+    if (!chatResponse?.choices?.length) throw new Error("Mistral AI response is empty");
+
+    let content = chatResponse.choices[0]?.message?.content;
+    if (typeof content === "string") {
+      content = content.trim();
+    } else {
+      content = ""; // Handle non-string content appropriately
+    }
+    
+    // Ensure the response is an exact match from IC_enum
+    if (content && IC_enum.includes(content)) {
+      return content;
     }
 
-    const content = typeof chatResponse.choices[0].message?.content === "string"
-      ? chatResponse.choices[0].message.content.trim().toLowerCase()
-      : undefined;
-    return content && IC_enum.includes(content) ? content : "generalQuery";
+    // If AI response is unreliable, apply simple keyword-based matching
+    const lowerTranscript = transcript.toLowerCase();
+
+    if (lowerTranscript.includes("loan") && lowerTranscript.includes("apply")) return "loanApplication";
+    if (lowerTranscript.includes("loan") && lowerTranscript.includes("eligible")) return "loanEligibility";
+    if (lowerTranscript.includes("finance") || lowerTranscript.includes("money") || lowerTranscript.includes("investment")) return "financialGuidance";
+
+    return "generalQuery"; // Default fallback
   } catch (error) {
     console.error("Intent Classification Error:", error);
     return "generalQuery";

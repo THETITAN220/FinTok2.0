@@ -1,20 +1,22 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
+import ChatHistory from "@/app/models/ChatHistory";
+import { v4 as uuidv4 } from "uuid";
+import { auth } from "@/lib/auth";
 
-// MongoDB Connection
 const MONGO_URI = process.env.MONGO_URI;
 if (!MONGO_URI) throw new Error("MongoDB URI is missing!");
 mongoose.connect(MONGO_URI);
 
-// Define Chat History Schema
-const chatSchema = new mongoose.Schema({
-  messages: [String],
-});
-const ChatHistory = mongoose.models.ChatHistory || mongoose.model("ChatHistory", chatSchema);
-
 export async function POST(req: NextRequest) {
   try {
+    const session = await auth();
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = session.user.id;
     const flashApiKey = process.env.FLASH_API_KEY;
     if (!flashApiKey) {
       return NextResponse.json(
@@ -24,7 +26,7 @@ export async function POST(req: NextRequest) {
     }
 
     const system_instruction = process.env.SYSTEM_INSTRUCTION;
-    const { prompt } = await req.json();
+    const { prompt, uuid } = await req.json();
 
     if (!prompt) {
       return NextResponse.json(
@@ -33,22 +35,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Load existing conversation history from MongoDB (or create if none exists)
-    let history = await ChatHistory.findOne();
-    if (!history) {
-      history = await ChatHistory.create({ messages: [] });
+    let chat;
+    if (uuid) {
+      chat = await ChatHistory.findOne({ uuid, userId });
     }
 
-    // Add user message
-    history.messages.push(`User: ${prompt}`);
-
-    // Keep only the last 10 messages
-    if (history.messages.length > 10) {
-      history.messages = history.messages.slice(-10);
+    if (!chat) {
+      chat = await ChatHistory.create({
+        uuid: uuid || uuidv4(),
+        userId,
+        messages: [],
+      });
     }
 
-    // Format conversation history
-    const context = history.messages.join("\n");
+    chat.messages.push(`User: ${prompt}`);
+    if (chat.messages.length > 10) {
+      chat.messages = chat.messages.slice(-10);
+    }
+
+    const context = chat.messages.join("\n");
 
     const genAI = new GoogleGenerativeAI(flashApiKey);
     const model = genAI.getGenerativeModel({
@@ -56,17 +61,13 @@ export async function POST(req: NextRequest) {
       systemInstruction: system_instruction,
     });
 
-    // Generate AI response
     const result = await model.generateContent(context);
     const aiResponse = await result.response.text();
 
-    // Add AI response to history
-    history.messages.push(`AI: ${aiResponse}`);
+    chat.messages.push(`AI: ${aiResponse}`);
+    await chat.save();
 
-    // Save updated history
-    await history.save();
-
-    return NextResponse.json({ response: aiResponse });
+    return NextResponse.json({ response: aiResponse, uuid: chat.uuid });
   } catch (error) {
     console.error("Error generating AI response:", error);
     return NextResponse.json(

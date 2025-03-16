@@ -169,10 +169,10 @@ const InputField: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 backdrop-blur-lg backdrop-filter">
           <div className="flex items-end gap-2">
             <div className="flex-1">
-              <Input
+              <textarea
                 ref={textareaRef}
                 placeholder="Enter the job description..."
-                className="min-h-[44px] px-4 py-3 rounded-lg border-gray-200 focus:border-black focus:ring-black"
+                className="min-h-[44px] px-4 py-3 rounded-lg border-gray-200 focus:border-black focus:ring-black w-full"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();

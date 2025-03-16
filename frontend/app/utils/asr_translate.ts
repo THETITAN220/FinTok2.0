@@ -30,8 +30,6 @@
 //   }
 // }
 
-// 
-
 import { flash } from "./flash";  
 
 export async function transcribeAudio(audioBlob: Blob): Promise<{ text: string; audioUrl: string }> {
